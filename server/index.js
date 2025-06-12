@@ -15,7 +15,7 @@ const io = new Server(server, {
 });
 
 const users = {}; // username -> socket.id
-const privateMessages = {}; // "alice_bob" => [ { from, to, message, time } ]
+const privateMessages = {}; // "alice_bob" => [ { from, to, message, image, time } ]
 
 function getKey(user1, user2) {
   return [user1, user2].sort().join('_');
@@ -29,9 +29,9 @@ io.on('connection', (socket) => {
     io.emit('user_list', Object.keys(users));
   });
 
-  socket.on('private_message', ({ to, from, message }) => {
+  socket.on('private_message', ({ to, from, message, image }) => {
     const time = new Date().toLocaleTimeString();
-    const msg = { from, to, message, time };
+    const msg = { from, to, message, image, time };
 
     const key = getKey(from, to);
     if (!privateMessages[key]) privateMessages[key] = [];
