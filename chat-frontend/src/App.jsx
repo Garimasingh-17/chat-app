@@ -8,6 +8,7 @@ export default function App() {
   const [joined, setJoined] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   const [error, setError] = useState('');
+  const [allUsers, setAllUsers] = useState([]);
 
   const handleAuth = () => {
     const users = JSON.parse(localStorage.getItem('chatUsers')) || {};
@@ -23,11 +24,13 @@ export default function App() {
       } else {
         users[username] = password;
         localStorage.setItem('chatUsers', JSON.stringify(users));
+        setAllUsers(Object.keys(users));
         setJoined(true);
         setError('');
       }
     } else {
       if (users[username] === password) {
+        setAllUsers(Object.keys(users));
         setJoined(true);
         setError('');
       } else {
@@ -71,7 +74,7 @@ export default function App() {
           </p>
         </div>
       ) : (
-        <ChatRoom username={username} />
+        <ChatRoom username={username} allUsers={allUsers} />
       )}
     </div>
   );
