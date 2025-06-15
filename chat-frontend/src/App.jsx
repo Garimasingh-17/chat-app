@@ -40,38 +40,49 @@ export default function App() {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
       {!joined ? (
-        <div className="text-center">
-          <h2>{isSignup ? '📝 Sign Up' : '🔐 Login to Chat App'}</h2>
+        <div className="card shadow p-4 w-100" style={{ maxWidth: '450px' }}>
+          <h2 className="text-center mb-4">
+            {isSignup ? '📝 Sign Up' : '🔐 Login to Chat App'}
+          </h2>
 
-          <input
-            className="form-control w-50 mx-auto mt-3"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          <div className="mb-3">
+            <input
+              className="form-control"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
 
-          <input
-            type="password"
-            className="form-control w-50 mx-auto mt-3"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="mb-3">
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-          {error && <p className="text-danger mt-2">{error}</p>}
+          {error && <div className="text-danger text-center mb-2">{error}</div>}
 
-          <button className="btn btn-primary mt-3" onClick={handleAuth}>
-            {isSignup ? 'Create Account' : 'Login'}
-          </button>
+          <div className="d-grid">
+            <button className="btn btn-primary" onClick={handleAuth}>
+              {isSignup ? 'Create Account' : 'Login'}
+            </button>
+          </div>
 
-          <p className="mt-3">
+          <div className="text-center mt-3">
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button className="btn btn-link" onClick={() => setIsSignup(!isSignup)}>
+            <button
+              className="btn btn-link p-0"
+              onClick={() => setIsSignup(!isSignup)}
+            >
               {isSignup ? 'Login here' : 'Sign up'}
             </button>
-          </p>
+          </div>
         </div>
       ) : (
         <ChatRoom username={username} allUsers={allUsers} />
