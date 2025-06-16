@@ -10,19 +10,26 @@ export default function ChatRoom({ username, allUsers }) {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
+  const [groupList, setGroupList] = useState([]);
+const [showGroupModal, setShowGroupModal] = useState(false);
+const [groupName, setGroupName] = useState('');
+const [selectedGroupUsers, setSelectedGroupUsers] = useState([]);
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [selectedMsgIndex, setSelectedMsgIndex] = useState(null);
   const [forwardMessageContent, setForwardMessageContent] = useState(null);
   const [showForwardTo, setShowForwardTo] = useState(false);
+  
   const chatEndRef = useRef(null);
 
-  useEffect(() => {
+useEffect(() => {
     socket.emit('register_user', username);
     socket.emit('sync_users', allUsers);
 
     socket.on('user_list', ({ all, online }) => {
       setOnlineUsers(online);
     });
+
 
     socket.on('private_message', (msg) => {
       const isActiveChat = msg.from === recipient || msg.to === recipient;
@@ -62,6 +69,17 @@ export default function ChatRoom({ username, allUsers }) {
   }, [username, recipient]);
 
   useEffect(() => {
+  socket.on('group_list', (groups) => {
+    setGroupList(groups);
+  });
+
+  return () => {
+    socket.off('group_list');
+  };
+}, []);
+
+
+  useEffect(() => {
     if (recipient) {
       socket.emit('fetch_history', { from: username, to: recipient });
       socket.emit('read_receipt', { from: username, to: recipient });
@@ -73,16 +91,63 @@ export default function ChatRoom({ username, allUsers }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messageList]);
 
-  const sendMessage = () => {
-    if (message.trim() && recipient) {
-      socket.emit('private_message', {
-        to: recipient,
-        from: username,
-        message,
-      });
-      setMessage('');
+ const sendMessage = () => {
+  if (!message.trim() || !recipient) return;
+
+  const isGroup = groupList.includes(recipient); // recipient is a group name?
+
+  if (isGroup) {
+    socket.emit('group_message', {
+      groupName: recipient,
+      from: username,
+      message,
+    });
+  } else {
+    socket.emit('private_message', {
+      to: recipient,
+      from: username,
+      message,
+    });
+  }
+
+  setMessage('');
+};
+
+
+
+  const handleCreateGroup = () => {
+  if (groupName.trim() && selectedGroupUsers.length > 0) {
+    const group = {
+      name: groupName,
+      members: [...selectedGroupUsers, username],
+    };
+    socket.emit('create_group', group);
+    setGroupName('');
+    setSelectedGroupUsers([]);
+    setShowGroupModal(false);
+  }
+};
+
+useEffect(() => {
+  const handleGroupMessage = (msg) => {
+    if (msg.to === recipient) {
+      setMessageList((prev) => [...prev, msg]);
+    } else {
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [msg.to]: (prev[msg.to] || 0) + 1,
+      }));
     }
   };
+
+  socket.on('group_message', handleGroupMessage);
+
+  return () => {
+    socket.off('group_message', handleGroupMessage);
+  };
+}, [recipient]);
+
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -139,6 +204,27 @@ export default function ChatRoom({ username, allUsers }) {
          <h1> {username}</h1>
         <div className="col-md-3 border-end overflow-auto">
           <h5>Users</h5>
+          <button className="btn btn-outline-primary mb-2" onClick={() => setShowGroupModal(true)}>
+  ➕ Create Group
+</button>
+
+<h6>Groups</h6>
+<ul className="list-group mb-4">
+  {groupList.map((group, idx) => (
+    <li
+      key={idx}
+      className={`list-group-item ${recipient === group ? 'active' : ''}`}
+      onClick={() => {
+        setRecipient(group);
+        socket.emit('fetch_group_history', { groupName: group });
+      }}
+      style={{ cursor: 'pointer' }}
+    >
+      🧑‍🤝‍🧑 {group}
+    </li>
+  ))}
+</ul>
+
 <ul className="list-group user-list" style={{ maxHeight: 'calc(90vh - 120px)', overflowY: 'auto' }}>
   {allUsers
     .filter((u) => u !== username)
@@ -402,6 +488,49 @@ export default function ChatRoom({ username, allUsers }) {
           </div>
         </div>
       )}
+      {showGroupModal && (
+  <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={() => setShowGroupModal(false)}>
+    <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content p-4">
+        <h5>Create Group</h5>
+        <input
+          className="form-control mb-2"
+          placeholder="Group name"
+          value={groupName}
+          onChange={(e) => setGroupName(e.target.value)}
+        />
+        <div className="mb-2" style={{ maxHeight: '150px', overflowY: 'auto' }}>
+          {allUsers.filter(u => u !== username).map((user, i) => (
+            <div key={i} className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                value={user}
+                onChange={(e) => {
+                  setSelectedGroupUsers((prev) =>
+                    e.target.checked
+                      ? [...prev, user]
+                      : prev.filter(u => u !== user)
+                  );
+                }}
+                id={`check-${user}`}
+              />
+              <label className="form-check-label" htmlFor={`check-${user}`}>
+                {user}
+              </label>
+            </div>
+          ))}
+        </div>
+        <div className="d-flex justify-content-end">
+          <button className="btn btn-secondary me-2" onClick={() => setShowGroupModal(false)}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleCreateGroup}>Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

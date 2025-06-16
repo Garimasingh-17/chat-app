@@ -14,6 +14,8 @@ const io = new Server(server, {
 const users = {}; // username -> socket.id
 const allUsers = new Set();
 const privateMessages = {}; // "user1_user2" => [messages]
+const groups = {}; // groupName => [members]
+const groupMessages = {};
 
 function getKey(user1, user2) {
   return [user1, user2].sort().join('_');
@@ -31,15 +33,39 @@ io.on('connection', (socket) => {
 
   socket.on('register_user', (username) => {
     users[username] = socket.id;
+    socket.username = username;
     allUsers.add(username);
     sendUserList();
+
+    // Send groups that user is a part of
+    const userGroups = Object.entries(groups)
+      .filter(([_, members]) => members.includes(username))
+      .map(([name]) => name);
+    socket.emit('group_list', userGroups);
   });
 
-  socket.on('sync_users', (usernames) => {
-    usernames.forEach((name) => allUsers.add(name));
-    sendUserList();
+  // Create group
+  socket.on('create_group', ({ name, members }) => {
+    if (!groups[name]) {
+      const fullMembers = Array.from(new Set([...members, socket.username]));
+      groups[name] = fullMembers;
+      groupMessages[name] = [];
+
+      console.log(`✅ Group created: ${name} -> [${fullMembers.join(', ')}]`);
+
+      fullMembers.forEach(member => {
+        const sockId = users[member];
+        if (sockId) {
+          const userGroups = Object.entries(groups)
+            .filter(([_, groupMembers]) => groupMembers.includes(member))
+            .map(([groupName]) => groupName);
+          io.to(sockId).emit('group_list', userGroups);
+        }
+      });
+    }
   });
 
+  // Send private message
   socket.on('private_message', ({ to, from, message, image, file }) => {
     const time = new Date().toLocaleTimeString();
     const msg = { from, to, message, image, file, time, read: false };
@@ -55,11 +81,30 @@ io.on('connection', (socket) => {
     if (fromSocket) io.to(fromSocket).emit('private_message', msg);
   });
 
+  // Fetch private history
   socket.on('fetch_history', ({ from, to }) => {
     const key = getKey(from, to);
     socket.emit('chat_history', privateMessages[key] || []);
   });
 
+  // Group message
+  socket.on('group_message', ({ groupName, from, message, file, image, forwarded }) => {
+    const time = new Date().toLocaleTimeString();
+    const msg = { from, to: groupName, message, file, image, time, forwarded };
+
+    if (!groupMessages[groupName]) groupMessages[groupName] = [];
+    groupMessages[groupName].push(msg);
+
+    const members = groups[groupName] || [];
+    members.forEach((member) => {
+      const memberSocket = users[member];
+      if (memberSocket) {
+        io.to(memberSocket).emit('group_message', msg);
+      }
+    });
+  });
+
+  // Read receipt
   socket.on('read_receipt', ({ from, to }) => {
     const key = getKey(from, to);
     if (privateMessages[key]) {
@@ -74,6 +119,18 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Fetch group history
+  socket.on('fetch_group_history', ({ groupName }) => {
+    socket.emit('chat_history', groupMessages[groupName] || []);
+  });
+
+  // Sync all users
+  socket.on('sync_users', (usernames) => {
+    usernames.forEach((name) => allUsers.add(name));
+    sendUserList();
+  });
+
+  // Handle disconnect
   socket.on('disconnect', () => {
     for (const [user, id] of Object.entries(users)) {
       if (id === socket.id) {
