@@ -13,9 +13,17 @@ const io = new Server(server, {
 
 const users = {}; // username -> socket.id
 const allUsers = new Set();
-const privateMessages = {}; // "user1_user2" => [messages]
-const groups = {}; // groupName => [members]
-const groupMessages = {};
+let privateMessages = {}; // "user1_user2" => [messages]
+let groups = {}; // groupName => [members]
+let groupMessages = {};
+
+const fs = require('fs');
+const path = require('path');
+
+const GROUPS_FILE = path.join(__dirname, 'groups.json');
+const PRIVATE_MESSAGES_FILE = './privateMessages.json';
+const GROUP_MESSAGES_FILE = './groupMessages.json';
+
 
 function getKey(user1, user2) {
   return [user1, user2].sort().join('_');
@@ -27,6 +35,40 @@ function sendUserList() {
     online: Object.keys(users),
   });
 }
+
+
+try {
+  if (fs.existsSync(GROUPS_FILE)) {
+    const data = JSON.parse(fs.readFileSync(GROUPS_FILE, 'utf8'));
+    groups = data.groups || {};
+    groupMessages = data.groupMessages || {};
+    console.log('📂 Loaded groups from file');
+  }
+} catch (err) {
+  console.error('❌ Error loading groups file:', err);
+}
+
+
+
+try {
+  if (fs.existsSync(PRIVATE_MESSAGES_FILE)) {
+    privateMessages = JSON.parse(fs.readFileSync(PRIVATE_MESSAGES_FILE, 'utf8'));
+    console.log('✅ Loaded private messages from file');
+  }
+} catch (err) {
+  console.error('❌ Error loading private messages:', err);
+}
+
+try {
+  if (fs.existsSync(GROUP_MESSAGES_FILE)) {
+    groupMessages = JSON.parse(fs.readFileSync(GROUP_MESSAGES_FILE, 'utf8'));
+    console.log('✅ Loaded group messages from file');
+  }
+} catch (err) {
+  console.error('❌ Error loading group messages:', err);
+}
+
+
 
 io.on('connection', (socket) => {
   console.log(`🔌 Connected: ${socket.id}`);
@@ -42,6 +84,11 @@ io.on('connection', (socket) => {
       .filter(([_, members]) => members.includes(username))
       .map(([name]) => name);
     socket.emit('group_list', userGroups);
+    // After emitting group_list to socket
+userGroups.forEach(group => {
+  socket.join(group); // 🔁 Join the user to each of their groups
+});
+
   });
 
   // Create group
@@ -49,6 +96,11 @@ io.on('connection', (socket) => {
     if (!groups[name]) {
       const fullMembers = Array.from(new Set([...members, socket.username]));
       groups[name] = fullMembers;
+      fs.writeFileSync(GROUPS_FILE, JSON.stringify({
+  groups,
+  groupMessages
+}, null, 2));
+
       groupMessages[name] = [];
 
       console.log(`✅ Group created: ${name} -> [${fullMembers.join(', ')}]`);
@@ -60,10 +112,21 @@ io.on('connection', (socket) => {
             .filter(([_, groupMembers]) => groupMembers.includes(member))
             .map(([groupName]) => groupName);
           io.to(sockId).emit('group_list', userGroups);
+          const memberSocket = io.sockets.sockets.get(sockId);
+        if (memberSocket) {
+          memberSocket.join(name); // This line ensures the group broadcast will work
+        }
         }
       });
     }
   });
+
+
+  socket.on('get_group_members', ({ groupName }) => {
+  const members = groups[groupName] || [];
+  socket.emit('group_members', { groupName, members });
+});
+
 
   // Send private message
   socket.on('private_message', ({ to, from, message, image, file }) => {
@@ -79,6 +142,10 @@ io.on('connection', (socket) => {
 
     if (toSocket && to !== from) io.to(toSocket).emit('private_message', msg);
     if (fromSocket) io.to(fromSocket).emit('private_message', msg);
+    
+  fs.writeFileSync(PRIVATE_MESSAGES_FILE, JSON.stringify(privateMessages, null, 2));
+
+
   });
 
   // Fetch private history
@@ -88,21 +155,29 @@ io.on('connection', (socket) => {
   });
 
   // Group message
-  socket.on('group_message', ({ groupName, from, message, file, image, forwarded }) => {
-    const time = new Date().toLocaleTimeString();
-    const msg = { from, to: groupName, message, file, image, time, forwarded };
+ socket.on('group_message', ({ groupName, from, message, file, image, forwarded }) => {
+  const time = new Date().toLocaleTimeString();
+  const msg = {
+    from,
+    to: groupName,
+    message,
+    file,
+    image,
+    time,
+    forwarded,
+    readBy: [from], // sender has read
+  };
 
-    if (!groupMessages[groupName]) groupMessages[groupName] = [];
-    groupMessages[groupName].push(msg);
+  if (!groupMessages[groupName]) groupMessages[groupName] = [];
+  groupMessages[groupName].push(msg);
 
-    const members = groups[groupName] || [];
-    members.forEach((member) => {
-      const memberSocket = users[member];
-      if (memberSocket) {
-        io.to(memberSocket).emit('group_message', msg);
-      }
-    });
-  });
+  io.to(groupName).emit('group_message', msg);
+
+    fs.writeFileSync(GROUP_MESSAGES_FILE, JSON.stringify(groupMessages, null, 2));
+
+
+});
+
 
   // Read receipt
   socket.on('read_receipt', ({ from, to }) => {
@@ -123,6 +198,23 @@ io.on('connection', (socket) => {
   socket.on('fetch_group_history', ({ groupName }) => {
     socket.emit('chat_history', groupMessages[groupName] || []);
   });
+
+  socket.on('mark_group_read', ({ groupName, username }) => {
+  const msgs = groupMessages[groupName] || [];
+
+  msgs.forEach((msg) => {
+    if (!msg.readBy.includes(username)) {
+      msg.readBy.push(username);
+    }
+  });
+
+  // Notify everyone in the group about the updated read status
+  io.to(groupName).emit('group_read_update', {
+    groupName,
+    messages: msgs,
+  });
+});
+
 
   // Sync all users
   socket.on('sync_users', (usernames) => {

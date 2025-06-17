@@ -10,15 +10,22 @@ export default function ChatRoom({ username, allUsers }) {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
-  const [groupList, setGroupList] = useState([]);
+const [groupList, setGroupList] = useState(() => {
+  const saved = localStorage.getItem('groupList');
+  return saved ? JSON.parse(saved) : [];
+});
+
 const [showGroupModal, setShowGroupModal] = useState(false);
 const [groupName, setGroupName] = useState('');
 const [selectedGroupUsers, setSelectedGroupUsers] = useState([]);
+const [base64Image, setBase64Image] = useState(null);
+const [base64File, setBase64File] = useState(null);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [selectedMsgIndex, setSelectedMsgIndex] = useState(null);
   const [forwardMessageContent, setForwardMessageContent] = useState(null);
   const [showForwardTo, setShowForwardTo] = useState(false);
+  
   
   const chatEndRef = useRef(null);
 
@@ -71,6 +78,7 @@ useEffect(() => {
   useEffect(() => {
   socket.on('group_list', (groups) => {
     setGroupList(groups);
+    localStorage.setItem('groupList', JSON.stringify(groups)); // 💾 Save to localStorage
   });
 
   return () => {
@@ -79,10 +87,12 @@ useEffect(() => {
 }, []);
 
 
+
   useEffect(() => {
     if (recipient) {
       socket.emit('fetch_history', { from: username, to: recipient });
       socket.emit('read_receipt', { from: username, to: recipient });
+      
     }
     setSelectedMsgIndex(null);
   }, [recipient, username]);
@@ -92,25 +102,33 @@ useEffect(() => {
   }, [messageList]);
 
  const sendMessage = () => {
-  if (!message.trim() || !recipient) return;
+  if ((!message.trim() && !base64Image && !base64File) || !recipient) return;
 
-  const isGroup = groupList.includes(recipient); // recipient is a group name?
+  const isGroup = groupList.includes(recipient); // group or private
+
+  const payload = {
+    from: username,
+    message,
+    image: base64Image,
+    file: base64File,
+    forwarded: false,
+  };
 
   if (isGroup) {
     socket.emit('group_message', {
+      ...payload,
       groupName: recipient,
-      from: username,
-      message,
     });
   } else {
     socket.emit('private_message', {
+      ...payload,
       to: recipient,
-      from: username,
-      message,
     });
   }
 
   setMessage('');
+  setBase64Image(null);
+  setBase64File(null);
 };
 
 
@@ -129,44 +147,110 @@ useEffect(() => {
 };
 
 useEffect(() => {
+  const storedGroups = JSON.parse(localStorage.getItem('groupList') || '[]');
+  if (storedGroups.length > 0) {
+    setGroupList(storedGroups);
+    // Optionally sync with server:
+    // socket.emit('sync_groups', storedGroups);
+  }
+}, []);
+
+
+useEffect(() => {
   const handleGroupMessage = (msg) => {
-    if (msg.to === recipient) {
+    const isCurrentGroup = recipient === msg.to;
+
+    if (isCurrentGroup) {
       setMessageList((prev) => [...prev, msg]);
+
+      // Inform server we read this
+      socket.emit('mark_group_read', {
+        groupName: recipient,
+        username,
+      });
     } else {
-      setUnreadCounts((prev) => ({
-        ...prev,
-        [msg.to]: (prev[msg.to] || 0) + 1,
-      }));
+     setUnreadCounts((prev) => ({
+    ...prev,
+    [msg.to]: (prev[msg.to] || 0) + 1,
+  }));
+    }
+  };
+
+  const handleGroupReadUpdate = ({ groupName, messages }) => {
+    if (groupName === recipient) {
+      setMessageList(messages);
     }
   };
 
   socket.on('group_message', handleGroupMessage);
+  socket.on('group_read_update', handleGroupReadUpdate);
 
   return () => {
     socket.off('group_message', handleGroupMessage);
+    socket.off('group_read_update', handleGroupReadUpdate);
+  };
+}, [recipient]);
+
+
+const [groupMembers, setGroupMembers] = useState([]);
+
+useEffect(() => {
+  socket.on('group_members', ({ groupName, members }) => {
+    if (groupName === recipient) {
+      setGroupMembers(members);
+    }
+  });
+
+  return () => {
+    socket.off('group_members');
   };
 }, [recipient]);
 
 
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file || !recipient) return;
+useEffect(() => {
+  if (groupList.includes(recipient)) {
+    // Fetch group chat history
+    socket.emit('fetch_group_history', { groupName: recipient });
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      socket.emit('private_message', {
-        to: recipient,
-        from: username,
-        file: {
-          name: file.name,
-          type: file.type,
-          data: reader.result,
-        },
+    // ✅ Mark all as read immediately when user opens group
+    socket.emit('mark_group_read', {
+      groupName: recipient,
+      username,
+    });
+        socket.emit('get_group_members', { groupName: recipient });
+         setUnreadCounts((prev) => {
+    const updated = { ...prev };
+    delete updated[recipient];
+    return updated;
+  });
+
+  }
+}, [recipient, username, groupList]);
+
+
+ const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (!file || !recipient) return;
+
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const base64 = reader.result;
+
+    if (file.type.startsWith('image/')) {
+      setBase64Image(base64);
+    } else {
+      setBase64File({
+        name: file.name,
+        type: file.type,
+        data: base64,
       });
-    };
-    reader.readAsDataURL(file);
+    }
   };
+
+  reader.readAsDataURL(file);
+};
+
 
   const handleDeleteMessage = (index) => {
     const updatedMessages = [...messageList];
@@ -198,33 +282,44 @@ useEffect(() => {
   return (
     <div className="container mt-4" style={{ height: '90vh' }}>
       
-
       <div className="row h-100">
         {/* Sidebar */}
          <h1> {username}</h1>
         <div className="col-md-3 border-end overflow-auto">
-          <h5>Users</h5>
           <button className="btn btn-outline-primary mb-2" onClick={() => setShowGroupModal(true)}>
   ➕ Create Group
 </button>
 
-<h6>Groups</h6>
-<ul className="list-group mb-4">
-  {groupList.map((group, idx) => (
+
+<h5>Groups</h5>
+<ul className="list-group mb-3">
+  {groupList.map((groupName) => (
     <li
-      key={idx}
-      className={`list-group-item ${recipient === group ? 'active' : ''}`}
-      onClick={() => {
-        setRecipient(group);
-        socket.emit('fetch_group_history', { groupName: group });
-      }}
-      style={{ cursor: 'pointer' }}
+      key={groupName}
+      className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${recipient === groupName ? 'active' : ''}`}
+      onClick={() => setRecipient(groupName)}
     >
-      🧑‍🤝‍🧑 {group}
+      <div className="me-auto">
+        {groupName}
+        {recipient === groupName && groupMembers.length > 0 && (
+          <div className="small text-muted mt-1">
+            <b>Members:</b> {groupMembers.join(', ')}
+          </div>
+        )}
+      </div>
+
+      {unreadCounts[groupName] > 0 && (
+        <span className="badge bg-danger rounded-pill">
+          {unreadCounts[groupName]}
+        </span>
+      )}
     </li>
   ))}
 </ul>
 
+
+
+<h5>Users</h5>
 <ul className="list-group user-list" style={{ maxHeight: 'calc(90vh - 120px)', overflowY: 'auto' }}>
   {allUsers
     .filter((u) => u !== username)
@@ -248,7 +343,6 @@ useEffect(() => {
       </li>
     ))}
 </ul>
-
 
         </div>
 
@@ -280,7 +374,21 @@ useEffect(() => {
       <div className={`message-bubble ${msg.from === username ? 'message-from-me' : 'message-from-other'}`}>
         
         {msg.forwarded && <small className="text-muted">(Forwarded)</small>}
+         <strong>{msg.from}</strong>
         <div>{msg.message}</div>
+
+{msg.image && (
+  <img
+    src={msg.image}
+    alt="Shared"
+    onClick={(e) => {
+      e.stopPropagation();
+      setSelectedImage(msg.image);
+      setSelectedImageIndex(idx);
+    }}
+    style={{ maxWidth: '100%', marginTop: '10px', borderRadius: '5px' }}
+  />
+)}
 
         {msg.file?.type?.startsWith('image/') && (
           <img
@@ -308,12 +416,22 @@ useEffect(() => {
         )}
 
         <div className="text-muted mt-2" style={{ fontSize: '0.8em' }}>
-          {msg.from === username && (
-            <span>{msg.read ? '✅✅ Read' : '✅ Sent'}</span>
-          )}
-         
-          {msg.time}
+  {groupList.includes(recipient) && msg.from === username ? (
+    <>
+      ✅ Read by {msg.readBy?.length || 0}
+      {msg.readBy?.length > 0 && (
+        <div style={{ fontSize: '0.75em' }}>
+          <small>{msg.readBy.join(', ')}</small>
         </div>
+      )}
+    </>
+  ) : msg.from === username ? (
+    <span>{msg.read ? '✅✅ Read' : '✅ Sent'}</span>
+  ) : null}
+  <br />
+  {msg.time}
+</div>
+
       </div>
 
       {selectedMsgIndex === idx && (
