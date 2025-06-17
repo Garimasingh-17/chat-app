@@ -229,6 +229,44 @@ useEffect(() => {
 }, [recipient, username, groupList]);
 
 
+const leaveGroup = (groupName) => {
+  if (!window.confirm(`Are you sure you want to leave ${groupName}?`)) return;
+
+  socket.emit('leave_group', { groupName, username });
+};
+
+
+
+useEffect(() => {
+  socket.on('left_group', ({ groupName }) => {
+    setGroupList((prev) => prev.filter((g) => g !== groupName));
+    if (recipient === groupName) setRecipient(null);
+    alert(`You left ${groupName}`);
+  });
+
+  return () => {
+    socket.off('left_group');
+  };
+}, [recipient]);
+
+
+
+
+
+useEffect(() => {
+  socket.on('group_update', ({ groupName, members, leftBy }) => {
+    if (groupName === recipient) {
+      setGroupMembers(members);
+    }
+  });
+
+  return () => {
+    socket.off('group_update');
+  };
+}, [recipient]);
+
+
+
  const handleFileChange = (e) => {
   const file = e.target.files[0];
   if (!file || !recipient) return;
@@ -316,6 +354,18 @@ useEffect(() => {
     </li>
   ))}
 </ul>
+
+
+{groupList.includes(recipient) && (
+  <button
+    className="btn btn-sm btn-danger mb-2"
+    onClick={() => leaveGroup(recipient)}
+  >
+    Leave Group
+  </button>
+)}
+
+
 
 
 

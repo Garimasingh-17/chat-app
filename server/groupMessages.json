@@ -10,7 +10,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -23,7 +24,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -36,7 +38,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -49,7 +52,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -62,7 +66,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -75,7 +80,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -88,7 +94,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -101,7 +108,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -114,7 +122,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -127,7 +136,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -140,7 +150,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -153,7 +164,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -166,7 +178,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -179,7 +192,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -192,7 +206,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -205,7 +220,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -218,7 +234,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -231,7 +248,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -244,7 +262,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -257,7 +276,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -270,7 +290,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -283,7 +304,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -296,7 +318,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -309,7 +332,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -322,7 +346,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -335,7 +360,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -348,7 +374,8 @@
       "forwarded": false,
       "readBy": [
         "abc",
-        "garima"
+        "garima",
+        "hello"
       ]
     },
     {
@@ -361,7 +388,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -373,6 +401,50 @@
       "time": "5:39:15 pm",
       "forwarded": false,
       "readBy": [
+        "garima",
+        "abc",
+        "hello"
+      ]
+    },
+    {
+      "from": "garima",
+      "to": "group",
+      "message": " gkn kn",
+      "file": null,
+      "image": null,
+      "time": "7:01:49 pm",
+      "forwarded": false,
+      "readBy": [
+        "garima",
+        "abc",
+        "hello"
+      ]
+    },
+    {
+      "from": "garima",
+      "to": "group",
+      "message": " vkdnv ",
+      "file": null,
+      "image": null,
+      "time": "7:01:51 pm",
+      "forwarded": false,
+      "readBy": [
+        "garima",
+        "abc",
+        "hello"
+      ]
+    },
+    {
+      "from": "hello",
+      "to": "group",
+      "message": " ng fgblbm;g",
+      "file": null,
+      "image": null,
+      "time": "7:02:25 pm",
+      "forwarded": false,
+      "readBy": [
+        "hello",
+        "abc",
         "garima"
       ]
     }
@@ -387,7 +459,36 @@
       "time": "5:23:43 pm",
       "forwarded": false,
       "readBy": [
-        "garima"
+        "garima",
+        "hij",
+        "xyz",
+        "lmn"
+      ]
+    },
+    {
+      "from": "garima",
+      "to": "group2",
+      "message": " vfdnv",
+      "file": null,
+      "image": null,
+      "time": "7:12:41 pm",
+      "forwarded": false,
+      "readBy": [
+        "garima",
+        "xyz",
+        "lmn"
+      ]
+    },
+    {
+      "from": "lmn",
+      "to": "group2",
+      "message": "nvfk",
+      "file": null,
+      "image": null,
+      "time": "7:21:34 pm",
+      "forwarded": false,
+      "readBy": [
+        "lmn"
       ]
     }
   ],
@@ -402,7 +503,8 @@
       "forwarded": false,
       "readBy": [
         "garima",
-        "abc"
+        "abc",
+        "hello"
       ]
     },
     {
@@ -414,7 +516,9 @@
       "time": "5:30:53 pm",
       "forwarded": false,
       "readBy": [
-        "abc"
+        "abc",
+        "hello",
+        "garima"
       ]
     },
     {
@@ -426,7 +530,9 @@
       "time": "5:31:05 pm",
       "forwarded": false,
       "readBy": [
-        "abc"
+        "abc",
+        "hello",
+        "garima"
       ]
     },
     {
@@ -436,6 +542,34 @@
       "file": null,
       "image": null,
       "time": "5:32:40 pm",
+      "forwarded": false,
+      "readBy": [
+        "abc",
+        "hello",
+        "garima"
+      ]
+    },
+    {
+      "from": "System",
+      "to": "group1",
+      "message": "👋 abc left the group.",
+      "file": null,
+      "image": null,
+      "time": "7:14:15 pm",
+      "forwarded": false,
+      "readBy": [
+        "abc",
+        "garima"
+      ],
+      "isSystem": true
+    },
+    {
+      "from": "abc",
+      "to": "group1",
+      "message": "vjng",
+      "file": null,
+      "image": null,
+      "time": "7:14:23 pm",
       "forwarded": false,
       "readBy": [
         "abc"

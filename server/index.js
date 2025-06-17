@@ -216,6 +216,37 @@ userGroups.forEach(group => {
 });
 
 
+socket.on('leave_group', ({ groupName, username }) => {
+  if (!groups[groupName]) return;
+
+  // Remove the user from the group
+  groups[groupName] = groups[groupName].filter((user) => user !== username);
+
+  // If no users left in the group, you can optionally delete the group
+  if (groups[groupName].length === 0) {
+    delete groups[groupName];
+  }
+
+  // Save changes to file (if persistent)
+  fs.writeFileSync(GROUPS_FILE, JSON.stringify({ groups, groupMessages }, null, 2));
+
+  // Remove user from room
+  socket.leave(groupName);
+
+  // Notify others in the group
+  io.to(groupName).emit('group_update', {
+    groupName,
+    members: groups[groupName],
+    leftBy: username,
+  });
+
+  // Send confirmation to the user
+  socket.emit('left_group', { groupName });
+});
+
+
+
+
   // Sync all users
   socket.on('sync_users', (usernames) => {
     usernames.forEach((name) => allUsers.add(name));
