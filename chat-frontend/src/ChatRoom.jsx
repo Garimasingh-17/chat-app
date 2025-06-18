@@ -186,39 +186,52 @@ useEffect(() => {
 
 
 useEffect(() => {
+  if (!socket) return;
+
   const handleGroupMessage = (msg) => {
     const isCurrentGroup = recipient === msg.to;
 
     if (isCurrentGroup) {
       setMessageList((prev) => [...prev, msg]);
 
-      // Inform server we read this
+      // Mark as read
       socket.emit('mark_group_read', {
         groupName: recipient,
         username,
       });
     } else {
-     setUnreadCounts((prev) => ({
-    ...prev,
-    [msg.to]: (prev[msg.to] || 0) + 1,
-  }));
+      // Increase unread count
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [msg.to]: (prev[msg.to] || 0) + 1,
+      }));
     }
   };
 
-  const handleGroupReadUpdate = ({ groupName, messages }) => {
-    if (groupName === recipient) {
-      setMessageList(messages);
-    }
+  // Initial unread counts when user logs in
+  const handleInitialUnreadCounts = (counts) => {
+    setUnreadCounts(counts); // counts is an object { groupName: count }
+  };
+
+  // Update unread count for one group
+  const handleUnreadCountUpdate = ({ groupName, count }) => {
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [groupName]: count,
+    }));
   };
 
   socket.on('group_message', handleGroupMessage);
-  socket.on('group_read_update', handleGroupReadUpdate);
+  socket.on('group_unread_counts', handleInitialUnreadCounts);
+  socket.on('group_unread_count_update', handleUnreadCountUpdate);
 
   return () => {
     socket.off('group_message', handleGroupMessage);
-    socket.off('group_read_update', handleGroupReadUpdate);
+    socket.off('group_unread_counts', handleInitialUnreadCounts);
+    socket.off('group_unread_count_update', handleUnreadCountUpdate);
   };
-}, [recipient]);
+}, [socket, recipient, username]);
+
 
 
 const [groupMembers, setGroupMembers] = useState([]);
@@ -364,7 +377,21 @@ useEffect(() => {
     <li
       key={groupName}
       className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${recipient === groupName ? 'active' : ''}`}
-      onClick={() => setRecipient(groupName)}
+      onClick={() => {
+        setRecipient(groupName);
+
+        // ✅ Reset unread count
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [groupName]: 0,
+        }));
+
+        // ✅ Inform server that group messages are read
+        socket.emit('mark_group_read', {
+          groupName,
+          username,
+        });
+      }}
     >
       <div className="me-auto">
         {groupName}
@@ -383,6 +410,7 @@ useEffect(() => {
     </li>
   ))}
 </ul>
+
 
 
 {groupList.includes(recipient) && (

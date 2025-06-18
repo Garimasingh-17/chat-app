@@ -6,7 +6,9 @@
       "def",
       "hello",
       "pqr",
-      "lmn"
+      "lmn",
+      "aaa",
+      null
     ],
     "group1": [
       "hello",
@@ -35,6 +37,20 @@
       null,
       "wxy",
       "aaa"
+    ],
+    "b hmm ": [
+      "hello",
+      "ccc",
+      "abc"
+    ],
+    "mb bj, ": [
+      "def",
+      "ccc",
+      "garima",
+      "hello",
+      "abc",
+      "hij",
+      null
     ]
   },
   "groupMessages": {
@@ -535,8 +551,7 @@
         "time": "11:21:19 am",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -548,8 +563,7 @@
         "time": "11:21:19 am",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -561,8 +575,7 @@
         "time": "11:21:19 am",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -574,8 +587,7 @@
         "time": "11:21:54 am",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -587,8 +599,7 @@
         "time": "11:21:55 am",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -600,8 +611,7 @@
         "time": "11:22:42 am",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -613,8 +623,7 @@
         "time": "2:14:04 pm",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -626,8 +635,7 @@
         "time": "2:14:05 pm",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -639,8 +647,7 @@
         "time": "2:14:06 pm",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
       },
       {
@@ -650,18 +657,51 @@
         "isSystem": true,
         "time": "2:28:21 pm",
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
+        ]
+      },
+      {
+        "from": "garima",
+        "to": "group",
+        "message": "jvjl",
+        "file": null,
+        "image": null,
+        "time": "3:32:43 pm",
+        "forwarded": false,
+        "readBy": [
+          "garima"
+        ]
+      },
+      {
+        "from": "garima",
+        "to": "group",
+        "message": " kb",
+        "file": null,
+        "image": null,
+        "time": "3:32:45 pm",
+        "forwarded": false,
+        "readBy": [
+          "garima"
         ]
       },
       {
         "from": "System",
         "to": "group",
-        "message": "❌ wxy was removed from the group.",
+        "message": "✅ aaa added to the group.",
         "isSystem": true,
-        "time": "3:18:21 pm",
+        "time": "3:34:46 pm",
         "readBy": [
-          "abc"
+          "garima"
+        ]
+      },
+      {
+        "from": "System",
+        "to": "group",
+        "message": "✅ undefined was added to the group.",
+        "isSystem": true,
+        "time": "3:34:46 pm",
+        "readBy": [
+          "garima"
         ]
       }
     ],
@@ -802,16 +842,8 @@
         "time": "2:28:54 pm",
         "forwarded": false,
         "readBy": [
-          "garima",
-          "abc"
+          "garima"
         ]
-      },
-      {
-        "from": "System",
-        "to": "fg ef",
-        "message": "❌ garima was removed from the group.",
-        "isSystem": true,
-        "time": "3:18:43 pm"
       }
     ],
     "n;kfnb'b": [
@@ -838,6 +870,23 @@
         "readBy": [
           "garima"
         ]
+      }
+    ],
+    "b hmm ": [],
+    "mb bj, ": [
+      {
+        "from": "System",
+        "to": "mb bj, ",
+        "message": "✅ hello, abc, hij added to the group.",
+        "isSystem": true,
+        "time": "3:35:48 pm"
+      },
+      {
+        "from": "System",
+        "to": "mb bj, ",
+        "message": "✅ undefined was added to the group.",
+        "isSystem": true,
+        "time": "3:35:48 pm"
       }
     ]
   }

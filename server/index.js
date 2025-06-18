@@ -84,6 +84,15 @@ io.on('connection', (socket) => {
       .filter(([_, members]) => members.includes(username))
       .map(([name]) => name);
     socket.emit('group_list', userGroups);
+    const unreadCounts = {};
+userGroups.forEach(group => {
+  const messages = groupMessages[group] || [];
+  const unread = messages.filter(m => !m.readBy || !m.readBy.includes(username));
+  unreadCounts[group] = unread.length;
+});
+
+socket.emit('group_unread_counts', unreadCounts);
+
     // After emitting group_list to socket
 userGroups.forEach(group => {
   socket.join(group); // 🔁 Join the user to each of their groups
