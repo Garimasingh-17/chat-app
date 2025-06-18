@@ -221,17 +221,23 @@ msgs.forEach((msg) => {
 });
 
 
-socket.on('add_to_group', ({ groupName, newMember }) => {
+socket.on('add_to_group', ({ groupName, newMembers }) => {
   if (!groups[groupName]) return;
 
-  if (!groups[groupName].includes(newMember)) {
-    groups[groupName].push(newMember);
+  const addedUsers = [];
 
-    // Send system message to group
+  newMembers.forEach((user) => {
+    if (!groups[groupName].includes(user)) {
+      groups[groupName].push(user);
+      addedUsers.push(user);
+    }
+  });
+
+  if (addedUsers.length > 0) {
     const msg = {
       from: 'System',
       to: groupName,
-      message: `✅ ${newMember} was added to the group.`,
+      message: `✅ ${addedUsers.join(', ')} added to the group.`,
       isSystem: true,
       time: new Date().toLocaleTimeString(),
     };
@@ -240,8 +246,6 @@ socket.on('add_to_group', ({ groupName, newMember }) => {
     groupMessages[groupName].push(msg);
 
     io.to(groupName).emit('group_message', msg);
-
-    // Save to file
     fs.writeFileSync(GROUPS_FILE, JSON.stringify({ groups, groupMessages }, null, 2));
   }
 });

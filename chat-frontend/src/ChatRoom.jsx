@@ -17,7 +17,7 @@ const [groupList, setGroupList] = useState(() => {
 
 
 const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-const [selectedNewMember, setSelectedNewMember] = useState('');
+const [selectedNewMembers, setSelectedNewMembers] = useState([]);
 
 const [showGroupModal, setShowGroupModal] = useState(false);
 const [groupName, setGroupName] = useState('');
@@ -32,6 +32,27 @@ const [base64File, setBase64File] = useState(null);
   
   
   const chatEndRef = useRef(null);
+  const [selectedGroup, setSelectedGroup] = useState('');
+const [selectedUsersToAdd, setSelectedUsersToAdd] = useState([]);
+
+const handleUserSelection = (e) => {
+  const options = Array.from(e.target.selectedOptions);
+  const usernames = options.map((opt) => opt.value);
+  setSelectedUsersToAdd(usernames);
+};
+
+const handleAddMembers = () => {
+  if (selectedGroup && selectedUsersToAdd.length > 0) {
+    socket.emit('add_to_group', {
+      groupName: selectedGroup,
+      newMembers: selectedUsersToAdd,
+    });
+
+    alert(`Added ${selectedUsersToAdd.join(', ')} to ${selectedGroup}`);
+    setSelectedUsersToAdd([]);
+  }
+};
+
 
 useEffect(() => {
     socket.emit('register_user', username);
@@ -483,10 +504,10 @@ useEffect(() => {
         <div className="text-muted mt-2" style={{ fontSize: '0.8em' }}>
   {groupList.includes(recipient) && msg.from === username ? (
     <>
-      ✅ Read by {msg.readBy?.length || 0}
-      {msg.readBy?.length > 0 && (
+      ✅ Read by {(msg.readBy?.filter((u) => u !== username).length) || 0}
+      {msg.readBy?.some((u) => u !== username) && (
         <div style={{ fontSize: '0.75em' }}>
-          <small>{msg.readBy.join(', ')}</small>
+          <small>{msg.readBy.filter((u) => u !== username).join(', ')}</small>
         </div>
       )}
     </>
@@ -496,6 +517,7 @@ useEffect(() => {
   <br />
   {msg.time}
 </div>
+
 
       </div>
 
@@ -632,25 +654,29 @@ useEffect(() => {
 
 
 
+
+
 {showAddMemberModal && (
   <div className="modal d-block" tabIndex="-1">
     <div className="modal-dialog">
       <div className="modal-content p-3">
         <h5>Add Member to <b>{recipient}</b></h5>
         <select
-          className="form-select my-2"
-          value={selectedNewMember}
-          onChange={(e) => setSelectedNewMember(e.target.value)}
-        >
-          <option value="">Select user</option>
-          {Array.from(allUsers).map((user) =>
-            !groupMembers.includes(user) && user !== username ? (
-              <option key={user} value={user}>
-                {user}
-              </option>
-            ) : null
-          )}
-        </select>
+  multiple
+  className="form-select my-2"
+  onChange={(e) => {
+    const selected = Array.from(e.target.selectedOptions).map((opt) => opt.value);
+    setSelectedNewMembers(selected);
+  }}
+>
+  {Array.from(allUsers).map((user) =>
+    !groupMembers.includes(user) && user !== username ? (
+      <option key={user} value={user}>
+        {user}
+      </option>
+    ) : null
+  )}
+</select>
         <div className="d-flex justify-content-end gap-2">
           <button className="btn btn-secondary" onClick={() => setShowAddMemberModal(false)}>
             Cancel
@@ -658,13 +684,14 @@ useEffect(() => {
           <button
             className="btn btn-primary"
             onClick={() => {
-              if (selectedNewMember) {
-                socket.emit('add_to_group', {
-                  groupName: recipient,
-                  newMember: selectedNewMember,
-                });
+              if (selectedNewMembers.length > 0) {
+  socket.emit('add_to_group', {
+    groupName: recipient,
+    newMembers: selectedNewMembers,
+  });
+
                 setShowAddMemberModal(false);
-                setSelectedNewMember('');
+setSelectedNewMembers([]);
                 socket.emit('get_group_members', { groupName: recipient }); // Refresh members list
               }
             }}
