@@ -30,6 +30,10 @@ const [base64File, setBase64File] = useState(null);
   const [forwardMessageContent, setForwardMessageContent] = useState(null);
   const [showForwardTo, setShowForwardTo] = useState(false);
   
+
+  const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
+const [selectedMemberToRemove, setSelectedMemberToRemove] = useState('');
+
   
   const chatEndRef = useRef(null);
   const [selectedGroup, setSelectedGroup] = useState('');
@@ -403,6 +407,58 @@ useEffect(() => {
 
 
 
+{groupList.includes(recipient) && (
+  <button
+    className="btn btn-sm btn-outline-danger my-2 ms-2"
+    onClick={() => setShowRemoveMemberModal(true)}
+  >
+    ❌ Remove Member
+  </button>
+)}
+{showRemoveMemberModal && (
+  <div className="modal d-block" tabIndex="-1">
+    <div className="modal-dialog">
+      <div className="modal-content p-3">
+        <h5>Remove Member from <b>{recipient}</b></h5>
+        <select
+          className="form-select my-2"
+          value={selectedMemberToRemove}
+          onChange={(e) => setSelectedMemberToRemove(e.target.value)}
+        >
+          <option value="">Select member</option>
+          {groupMembers
+            .filter((user) => user !== username) // Cannot remove self
+            .map((user) => (
+              <option key={user} value={user}>
+                {user}
+              </option>
+            ))}
+        </select>
+        <div className="d-flex justify-content-end gap-2">
+          <button className="btn btn-secondary" onClick={() => setShowRemoveMemberModal(false)}>
+            Cancel
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              if (selectedMemberToRemove) {
+                socket.emit('remove_from_group', {
+                  groupName: recipient,
+                  member: selectedMemberToRemove,
+                });
+                setShowRemoveMemberModal(false);
+                setSelectedMemberToRemove('');
+                socket.emit('get_group_members', { groupName: recipient });
+              }
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
 
 <h5>Users</h5>

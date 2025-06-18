@@ -287,6 +287,41 @@ socket.on('leave_group', ({ groupName, username }) => {
 });
 
 
+socket.on('remove_from_group', ({ groupName, member }) => {
+  if (!groups[groupName]) return;
+
+  groups[groupName] = groups[groupName].filter((user) => user !== member);
+
+  // Optionally delete group if empty
+  if (groups[groupName].length === 0) {
+    delete groups[groupName];
+  }
+
+  // System message to group
+  const msg = {
+    from: 'System',
+    to: groupName,
+    message: `❌ ${member} was removed from the group.`,
+    isSystem: true,
+    time: new Date().toLocaleTimeString(),
+  };
+
+  groupMessages[groupName] = groupMessages[groupName] || [];
+  groupMessages[groupName].push(msg);
+
+  io.to(groupName).emit('group_message', msg);
+  io.to(groupName).emit('group_update', {
+    groupName,
+    members: groups[groupName],
+    removedBy: socket.username || 'admin',
+    removedUser: member,
+  });
+
+  fs.writeFileSync(GROUPS_FILE, JSON.stringify({ groups, groupMessages }, null, 2));
+});
+
+
+
 socket.on('add_to_group', ({ groupName, newMember }) => {
   if (!groups[groupName]) return;
 

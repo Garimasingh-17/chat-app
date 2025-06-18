@@ -6,8 +6,7 @@
       "def",
       "hello",
       "pqr",
-      "lmn",
-      "wxy"
+      "lmn"
     ],
     "group1": [
       "hello",
@@ -20,7 +19,6 @@
       "def",
       "abc",
       "hello",
-      "garima",
       "ccc",
       null,
       "lmn",
@@ -655,6 +653,16 @@
           "garima",
           "abc"
         ]
+      },
+      {
+        "from": "System",
+        "to": "group",
+        "message": "❌ wxy was removed from the group.",
+        "isSystem": true,
+        "time": "3:18:21 pm",
+        "readBy": [
+          "abc"
+        ]
       }
     ],
     "group2": [
@@ -801,46 +809,9 @@
       {
         "from": "System",
         "to": "fg ef",
-        "message": "✅ ccc added to the group.",
+        "message": "❌ garima was removed from the group.",
         "isSystem": true,
-        "time": "2:53:23 pm",
-        "readBy": [
-          "abc",
-          "garima"
-        ]
-      },
-      {
-        "from": "System",
-        "to": "fg ef",
-        "message": "✅ undefined was added to the group.",
-        "isSystem": true,
-        "time": "2:53:23 pm",
-        "readBy": [
-          "abc",
-          "garima"
-        ]
-      },
-      {
-        "from": "System",
-        "to": "fg ef",
-        "message": "✅ lmn, xyz added to the group.",
-        "isSystem": true,
-        "time": "2:53:34 pm",
-        "readBy": [
-          "abc",
-          "garima"
-        ]
-      },
-      {
-        "from": "System",
-        "to": "fg ef",
-        "message": "✅ wxy, aaa added to the group.",
-        "isSystem": true,
-        "time": "2:53:46 pm",
-        "readBy": [
-          "abc",
-          "garima"
-        ]
+        "time": "3:18:43 pm"
       }
     ],
     "n;kfnb'b": [
@@ -864,36 +835,6 @@
         "image": null,
         "time": "2:29:07 pm",
         "forwarded": false,
-        "readBy": [
-          "garima"
-        ]
-      },
-      {
-        "from": "System",
-        "to": "n;kfnb'b",
-        "message": "✅ hello, abc added to the group.",
-        "isSystem": true,
-        "time": "2:54:06 pm",
-        "readBy": [
-          "garima"
-        ]
-      },
-      {
-        "from": "System",
-        "to": "n;kfnb'b",
-        "message": "✅ undefined was added to the group.",
-        "isSystem": true,
-        "time": "2:54:06 pm",
-        "readBy": [
-          "garima"
-        ]
-      },
-      {
-        "from": "System",
-        "to": "n;kfnb'b",
-        "message": "✅ wxy, aaa added to the group.",
-        "isSystem": true,
-        "time": "2:54:15 pm",
         "readBy": [
           "garima"
         ]
