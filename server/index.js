@@ -201,12 +201,17 @@ userGroups.forEach(group => {
 
   socket.on('mark_group_read', ({ groupName, username }) => {
   const msgs = groupMessages[groupName] || [];
+msgs.forEach((msg) => {
+  // Initialize readBy if it's undefined
+  if (!Array.isArray(msg.readBy)) {
+    msg.readBy = [];
+  }
 
-  msgs.forEach((msg) => {
-    if (!msg.readBy.includes(username)) {
-      msg.readBy.push(username);
-    }
-  });
+  if (!msg.readBy.includes(username)) {
+    msg.readBy.push(username);
+  }
+});
+
 
   // Notify everyone in the group about the updated read status
   io.to(groupName).emit('group_read_update', {
@@ -214,6 +219,39 @@ userGroups.forEach(group => {
     messages: msgs,
   });
 });
+
+
+socket.on('add_to_group', ({ groupName, newMember }) => {
+  if (!groups[groupName]) return;
+
+  if (!groups[groupName].includes(newMember)) {
+    groups[groupName].push(newMember);
+
+    // Send system message to group
+    const msg = {
+      from: 'System',
+      to: groupName,
+      message: `✅ ${newMember} was added to the group.`,
+      isSystem: true,
+      time: new Date().toLocaleTimeString(),
+    };
+
+    groupMessages[groupName] = groupMessages[groupName] || [];
+    groupMessages[groupName].push(msg);
+
+    io.to(groupName).emit('group_message', msg);
+
+    // Save to file
+    fs.writeFileSync(GROUPS_FILE, JSON.stringify({ groups, groupMessages }, null, 2));
+  }
+});
+
+
+socket.on('get_group_members', ({ groupName }) => {
+  const members = groups[groupName] || [];
+  io.to(socket.id).emit('group_members', { groupName, members });
+});
+
 
 
 socket.on('leave_group', ({ groupName, username }) => {
@@ -242,6 +280,32 @@ socket.on('leave_group', ({ groupName, username }) => {
 
   // Send confirmation to the user
   socket.emit('left_group', { groupName });
+});
+
+
+socket.on('add_to_group', ({ groupName, newMember }) => {
+  if (!groups[groupName]) return;
+
+  if (!groups[groupName].includes(newMember)) {
+    groups[groupName].push(newMember);
+
+    // Send system message to group
+    const msg = {
+      from: 'System',
+      to: groupName,
+      message: `✅ ${newMember} was added to the group.`,
+      isSystem: true,
+      time: new Date().toLocaleTimeString(),
+    };
+
+    groupMessages[groupName] = groupMessages[groupName] || [];
+    groupMessages[groupName].push(msg);
+
+    io.to(groupName).emit('group_message', msg);
+
+    // Save to file
+    fs.writeFileSync(GROUPS_FILE, JSON.stringify({ groups, groupMessages }, null, 2));
+  }
 });
 
 

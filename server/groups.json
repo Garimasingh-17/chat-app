@@ -2,7 +2,8 @@
   "groups": {
     "group": [
       "abc",
-      "garima"
+      "garima",
+      "def"
     ],
     "group1": [
       "hello",
@@ -461,6 +462,26 @@
           "abc",
           "garima"
         ]
+      },
+      {
+        "from": "garima",
+        "to": "group",
+        "message": "bkdv",
+        "file": null,
+        "image": null,
+        "time": "10:58:04 am",
+        "forwarded": false,
+        "readBy": [
+          "garima",
+          "abc"
+        ]
+      },
+      {
+        "from": "System",
+        "to": "group",
+        "message": "✅ def was added to the group.",
+        "isSystem": true,
+        "time": "11:15:58 am"
       }
     ],
     "group2": [
@@ -475,7 +496,8 @@
         "readBy": [
           "garima",
           "hij",
-          "xyz"
+          "xyz",
+          "lmn"
         ]
       },
       {
@@ -488,7 +510,20 @@
         "forwarded": false,
         "readBy": [
           "garima",
-          "xyz"
+          "xyz",
+          "lmn"
+        ]
+      },
+      {
+        "from": "lmn",
+        "to": "group2",
+        "message": "nvfk",
+        "file": null,
+        "image": null,
+        "time": "7:21:34 pm",
+        "forwarded": false,
+        "readBy": [
+          "lmn"
         ]
       }
     ],

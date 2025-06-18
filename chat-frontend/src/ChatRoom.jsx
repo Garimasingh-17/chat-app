@@ -15,6 +15,10 @@ const [groupList, setGroupList] = useState(() => {
   return saved ? JSON.parse(saved) : [];
 });
 
+
+const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+const [selectedNewMember, setSelectedNewMember] = useState('');
+
 const [showGroupModal, setShowGroupModal] = useState(false);
 const [groupName, setGroupName] = useState('');
 const [selectedGroupUsers, setSelectedGroupUsers] = useState([]);
@@ -358,6 +362,17 @@ useEffect(() => {
 
 {groupList.includes(recipient) && (
   <button
+    className="btn btn-sm btn-outline-success my-2"
+    onClick={() => setShowAddMemberModal(true)}
+  >
+    ➕ Add Member
+  </button>
+)}
+
+
+
+{groupList.includes(recipient) && (
+  <button
     className="btn btn-sm btn-danger mb-2"
     onClick={() => leaveGroup(recipient)}
   >
@@ -614,6 +629,57 @@ useEffect(() => {
         </div>
       )}
 
+
+
+
+{showAddMemberModal && (
+  <div className="modal d-block" tabIndex="-1">
+    <div className="modal-dialog">
+      <div className="modal-content p-3">
+        <h5>Add Member to <b>{recipient}</b></h5>
+        <select
+          className="form-select my-2"
+          value={selectedNewMember}
+          onChange={(e) => setSelectedNewMember(e.target.value)}
+        >
+          <option value="">Select user</option>
+          {Array.from(allUsers).map((user) =>
+            !groupMembers.includes(user) && user !== username ? (
+              <option key={user} value={user}>
+                {user}
+              </option>
+            ) : null
+          )}
+        </select>
+        <div className="d-flex justify-content-end gap-2">
+          <button className="btn btn-secondary" onClick={() => setShowAddMemberModal(false)}>
+            Cancel
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              if (selectedNewMember) {
+                socket.emit('add_to_group', {
+                  groupName: recipient,
+                  newMember: selectedNewMember,
+                });
+                setShowAddMemberModal(false);
+                setSelectedNewMember('');
+                socket.emit('get_group_members', { groupName: recipient }); // Refresh members list
+              }
+            }}
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
       {/* Forward Modal */}
       {showForwardTo && (
         <div
@@ -696,6 +762,7 @@ useEffect(() => {
       </div>
     </div>
   </div>
+
 )}
 
 
