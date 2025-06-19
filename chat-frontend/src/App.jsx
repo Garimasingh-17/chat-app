@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ChatRoom from './ChatRoom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
 export default function App() {
   const [username, setUsername] = useState('');
@@ -38,23 +39,38 @@ export default function App() {
       }
     }
   };
+return (
+  <div className="container d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
+    
+    {/* 🔹 Branding Header (only before login) */}
+{!joined && (
+  <div className="mb-4 text-center">
+    <h1 className="text-white">💬 ChatterBox</h1>
+    <p className="text-light">Connect instantly. Chat privately.</p>
+  </div>
+)}
 
-  return (
-    <div className="container d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-      {!joined ? (
-        <div className="card shadow p-4 w-100" style={{ maxWidth: '450px' }}>
+
+    {!joined ? (
+      <div className="card shadow p-4 w-100" style={{ maxWidth: '450px' }}>
+        {/* form content */}
+
           <h2 className="text-center mb-4">
             {isSignup ? '📝 Sign Up' : '🔐 Login to Chat App'}
           </h2>
 
-          <div className="mb-3">
-            <input
-              className="form-control"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
+          <div className="input-group mb-3">
+  <span className="input-group-text">
+    <i className="bi bi-person"></i>
+  </span>
+  <input
+    type="text"
+    className="form-control"
+    placeholder="Username"
+    value={username}
+    onChange={(e) => setUsername(e.target.value)}
+  />
+</div>
 
           <div className="mb-3">
             <input

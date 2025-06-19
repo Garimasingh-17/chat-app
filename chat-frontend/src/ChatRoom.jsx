@@ -359,13 +359,13 @@ useEffect(() => {
     setForwardMessageContent(null);
   };
 
-  return (
-    <div className="container mt-4" style={{ height: '90vh' }}>
-      
-      <div className="row h-100">
+return (
+  <div className="container-fluid p-0" style={{ height: '100vh', overflow: 'hidden' }}>
+    <div className="row g-0 h-100">
+
         {/* Sidebar */}
          <h1> {username}</h1>
-        <div className="col-md-3 border-end overflow-auto">
+<div className="col-md-3 d-flex flex-column border-end" style={{ height: '100vh', overflowY: 'auto', backgroundColor: '#00bfff' }}>
           <button className="btn btn-outline-primary mb-2" onClick={() => setShowGroupModal(true)}>
   ➕ Create Group
 </button>
@@ -517,22 +517,22 @@ useEffect(() => {
         </div>
 
         {/* Chat Section */}
-<div className="col-md-9 d-flex flex-column" style={{ height: '100%' }}>
-  {/* Sticky Chat Header */}
-  <div
-    className="d-flex justify-content-between align-items-center border-bottom px-2 py-2"
-    style={{
-      position: 'sticky',
-      top: 0,
-      backgroundColor: '#fff',
-      zIndex: 10,
-    }}
-  >
-    <h3 className="mb-0"> {recipient || '...'}</h3>
-  </div>
+<div className="col-md-9 d-flex flex-column" style={{ height: '100vh', overflow: 'hidden' }}>
+ {/* Sticky Chat Header */}
+<div
+  className="d-flex justify-content-between align-items-center border-bottom px-2 py-2"
+  style={{
+    position: 'sticky',
+    top: 0,
+    backgroundColor: '#fff',
+    zIndex: 10,
+  }}
+>
+  <h3 className="mb-0">{recipient || '...'}</h3>
+</div>
 
 
-<div className="border p-3 rounded bg-light flex-grow-1 mb-2" style={{ overflowY: 'auto', height: 0 }}>
+<div className="border p-3 rounded bg-light flex-grow-1 mb-2" style={{ overflowY: 'auto' }}>
            {recipient ? (
   messageList.map((msg, idx) => (
     <div
