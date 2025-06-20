@@ -52,54 +52,59 @@ return (
 
 
     {!joined ? (
-      <div className="card shadow p-4 w-100" style={{ maxWidth: '450px' }}>
-        {/* form content */}
+      <div className="card shadow p-5 w-100" style={{ maxWidth: '450px' }}>
+  <h2 className="text-center mb-4 fw-bold">
+    {isSignup ? '📝 Create Your Account' : '🔐 Login to ChatterBox'}
+  </h2>
 
-          <h2 className="text-center mb-4">
-            {isSignup ? '📝 Sign Up' : '🔐 Login to Chat App'}
-          </h2>
+  <div className="input-group mb-4">
+    <span className="input-group-text">
+      <i className="bi bi-person"></i>
+    </span>
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Username"
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+    />
+  </div>
 
-          <div className="input-group mb-3">
-  <span className="input-group-text">
-    <i className="bi bi-person"></i>
-  </span>
-  <input
-    type="text"
-    className="form-control"
-    placeholder="Username"
-    value={username}
-    onChange={(e) => setUsername(e.target.value)}
-  />
+  <div className="input-group mb-4">
+    <span className="input-group-text">
+      <i className="bi bi-lock"></i>
+    </span>
+    <input
+      type="password"
+      className="form-control"
+      placeholder="Password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+  </div>
+
+  {error && <div className="text-danger text-center mb-3">{error}</div>}
+
+  <div className="d-grid mb-3">
+    <button className="btn btn-primary" onClick={handleAuth}>
+      {isSignup ? 'Create Account' : 'Login'}
+    </button>
+  </div>
+
+  <div className="text-center">
+    <small className="text-muted">
+      {isSignup ? 'Already have an account?' : "Don't have an account?"}
+    </small>
+    <br />
+    <button
+      className="btn btn-link"
+      onClick={() => setIsSignup(!isSignup)}
+    >
+      {isSignup ? 'Login here' : 'Sign up'}
+    </button>
+  </div>
 </div>
 
-          <div className="mb-3">
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          {error && <div className="text-danger text-center mb-2">{error}</div>}
-
-          <div className="d-grid">
-            <button className="btn btn-primary" onClick={handleAuth}>
-              {isSignup ? 'Create Account' : 'Login'}
-            </button>
-          </div>
-
-          <div className="text-center mt-3">
-            {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              className="btn btn-link p-0"
-              onClick={() => setIsSignup(!isSignup)}
-            >
-              {isSignup ? 'Login here' : 'Sign up'}
-            </button>
-          </div>
-        </div>
       ) : (
         <ChatRoom username={username} allUsers={allUsers} />
       )}
