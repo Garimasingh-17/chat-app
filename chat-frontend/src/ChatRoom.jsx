@@ -488,6 +488,7 @@ return (
   </div>
 )}
 
+<hr className="my-2" style={{ borderColor: 'rgba(255,255,255,0.3)' }} />
 
 <h5>Users</h5>
 <ul className="list-group user-list" style={{ maxHeight: 'calc(90vh - 120px)', overflowY: 'auto' }}>
@@ -499,12 +500,20 @@ return (
         className={`list-group-item user-item d-flex justify-content-between align-items-center ${recipient === user ? 'active' : ''}`}
         onClick={() => setRecipient(user)}
       >
-        <div className="d-flex flex-column">
-          <strong style={{ fontSize: '1rem' }}>{user}</strong>
-          <small className={`text-${onlineUsers.includes(user) ? 'success' : 'secondary'}`}>
-            {onlineUsers.includes(user) ? 'Online' : 'Offline'}
-          </small>
-        </div>
+        <div className="d-flex align-items-center gap-2">
+  <span
+    className="status-dot"
+    style={{
+      backgroundColor: onlineUsers.includes(user) ? 'limegreen' : '#ccc',
+      width: '10px',
+      height: '10px',
+      borderRadius: '50%',
+      display: 'inline-block',
+    }}
+  />
+  <strong style={{ fontSize: '1rem' }}>{user}</strong>
+</div>
+
         {unreadCounts[user] > 0 && (
           <span className="badge bg-danger rounded-pill">
             {unreadCounts[user]}
@@ -529,7 +538,21 @@ return (
   }}
 >
   <h3 className="mb-0">{recipient || '...'}</h3>
+
+  {/* ✅ Close Chat Button */}
+  {recipient && (
+    <button
+      className="btn btn-sm btn-outline-secondary"
+      onClick={() => setRecipient(null)}
+      title="Close Chat"
+    >
+      ❌ Close
+    </button>
+  )}
 </div>
+
+
+
 
 
 <div className="border p-3 rounded bg-light flex-grow-1 mb-2" style={{ overflowY: 'auto' }}>
@@ -585,22 +608,31 @@ return (
           </a>
         )}
 
-        <div className="text-muted mt-2" style={{ fontSize: '0.8em' }}>
-  {groupList.includes(recipient) && msg.from === username ? (
-    <>
-      ✅ Read by {(msg.readBy?.filter((u) => u !== username).length) || 0}
-      {msg.readBy?.some((u) => u !== username) && (
-        <div style={{ fontSize: '0.75em' }}>
-          <small>{msg.readBy.filter((u) => u !== username).join(', ')}</small>
-        </div>
-      )}
-    </>
-  ) : msg.from === username ? (
-    <span>{msg.read ? '✅✅ Read' : '✅ Sent'}</span>
+      <div className="message-meta mt-2">
+  {/* ✅ Read status */}
+  {msg.from === username ? (
+    groupList.includes(recipient) ? (
+      <>
+        <span className="read-status">
+          ✅ Read by {msg.readBy?.filter((u) => u !== username).length || 0}
+        </span>
+        {msg.readBy?.some((u) => u !== username) && (
+          <div className="read-by-list">
+            <small>{msg.readBy.filter((u) => u !== username).join(', ')}</small>
+          </div>
+        )}
+      </>
+    ) : (
+      <span className="read-status">
+        {msg.read ? '✅✅ Read' : '✅ Sent'}
+      </span>
+    )
   ) : null}
-  <br />
-  {msg.time}
+
+  {/* ⏱ Timestamp */}
+  <div className="message-time">{msg.time}</div>
 </div>
+
 
 
       </div>
@@ -630,7 +662,7 @@ return (
     </div>
   ))
 ) : (
-  <p className="text-muted">Select a user to view chat</p>
+<p className="text-muted text-center mt-5">🗨️ Select a user or group to start chatting</p>
 )}
 
             <div ref={chatEndRef} />
