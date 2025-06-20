@@ -555,8 +555,10 @@ return (
 
 
 
-<div className="border p-3 rounded bg-light flex-grow-1 mb-2" style={{ overflowY: 'auto' }}>
-           {recipient ? (
+<div
+  className={`flex-grow-1 mb-2 ${recipient ? 'border p-3 rounded bg-light' : ''}`}
+  style={{ overflowY: 'auto' }}
+>           {recipient ? (
   messageList.map((msg, idx) => (
     <div
       key={idx}
@@ -662,7 +664,10 @@ return (
     </div>
   ))
 ) : (
-<p className="text-muted text-center mt-5">🗨️ Select a user or group to start chatting</p>
+ <div className="d-flex flex-column justify-content-center align-items-center text-center" style={{ height: '100%' }}>
+      <h4 className="text-muted mb-2">💬 Select a user or group</h4>
+      <p className="text-muted">Start chatting by selecting a name from the left panel.</p>
+    </div>
 )}
 
             <div ref={chatEndRef} />
@@ -670,33 +675,33 @@ return (
 
           {/* Sticky Message Input */}
           <div
-            className="input-group"
-            style={{
-              position: 'sticky',
-              bottom: '0',
-              backgroundColor: '#fff',
-              paddingBottom: '10px',
-              paddingTop: '5px',
-              zIndex: 10,
-            }}
+    className="input-group"
+    style={{
+      position: 'sticky',
+      bottom: '0',
+      backgroundColor: '#fff',
+      paddingBottom: '10px',
+      paddingTop: '5px',
+      zIndex: 10,
+    }}
           >
             <input
-              type="text"
-              className="form-control"
-              placeholder="Type your message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            />
+      type="text"
+      className="form-control"
+      placeholder="Type your message"
+      value={message}
+      onChange={(e) => setMessage(e.target.value)}
+      onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+    />
             <input
-              type="file"
-              onChange={handleFileChange}
-              className="form-control"
-              style={{ maxWidth: '35%' }}
-            />
-            <button className="btn btn-primary" onClick={sendMessage}>
-              Send
-            </button>
+      type="file"
+      onChange={handleFileChange}
+      className="form-control"
+      style={{ maxWidth: '35%' }}
+    />
+           <button className="btn btn-primary" onClick={sendMessage}>
+      Send
+    </button>
           </div>
         </div>
       </div>
