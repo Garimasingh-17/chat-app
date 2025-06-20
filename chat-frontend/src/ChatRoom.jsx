@@ -528,19 +528,17 @@ return (
         {/* Chat Section */}
 <div className="col-md-9 d-flex flex-column" style={{ height: '100vh', overflow: 'hidden' }}>
  {/* Sticky Chat Header */}
-<div
-  className="d-flex justify-content-between align-items-center border-bottom px-2 py-2"
-  style={{
-    position: 'sticky',
-    top: 0,
-    backgroundColor: '#fff',
-    zIndex: 10,
-  }}
->
-  <h3 className="mb-0">{recipient || '...'}</h3>
-
-  {/* ✅ Close Chat Button */}
-  {recipient && (
+{recipient && (
+  <div
+    className="d-flex justify-content-between align-items-center border-bottom px-2 py-2"
+    style={{
+      position: 'sticky',
+      top: 0,
+      backgroundColor: '#fff',
+      zIndex: 10,
+    }}
+  >
+    <h3 className="mb-0">{recipient}</h3>
     <button
       className="btn btn-sm btn-outline-secondary"
       onClick={() => setRecipient(null)}
@@ -548,8 +546,8 @@ return (
     >
       ❌ Close
     </button>
-  )}
-</div>
+  </div>
+)}
 
 
 
