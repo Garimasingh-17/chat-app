@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 
+
 const socket = io('http://localhost:4000');
 
 export default function ChatRoom({ username, allUsers }) {
@@ -360,18 +361,27 @@ useEffect(() => {
   };
 
 return (
-  <div className="container-fluid p-0" style={{ height: '100vh', overflow: 'hidden' }}>
-    <div className="row g-0 h-100">
+  <div className="container-fluid p-0" style={{ height: '105svh', overflow: 'hidden' }}>
+    <div className="row g-0 h-100" style={{marginTop: 20}} >
 
         {/* Sidebar */}
          <h1> {username}</h1>
-<div className="col-md-3 d-flex flex-column border-end" style={{ height: '100vh', overflowY: 'auto', backgroundColor: '#00bfff' }}>
-          <button className="btn btn-outline-primary mb-2" onClick={() => setShowGroupModal(true)}>
-  ➕ Create Group
-</button>
+<div
+  className="col-md-3 d-flex flex-column border-end"
+  style={{
+    height: '100vh',
+    overflowY: 'auto',
+    backgroundColor: '#00bfff',
+    marginTop: 10, // ✅ Corrected camelCase
+  }}
+>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+  <h5 className="mb-0">Groups</h5>
+  <button className="btn btn-sm btn-outline-primary" onClick={() => setShowGroupModal(true)}>
+    ➕ Create Group
+  </button>
+</div>
 
-
-<h5>Groups</h5>
 <ul className="list-group mb-3">
   {groupList.map((groupName) => (
     <li
@@ -414,35 +424,28 @@ return (
 
 
 {groupList.includes(recipient) && (
-  <button
-    className="btn btn-sm btn-outline-success my-2"
-    onClick={() => setShowAddMemberModal(true)}
-  >
-    ➕ Add Member
-  </button>
+  <button className="group-action-btn add" onClick={() => setShowAddMemberModal(true)}>
+  <span style={{ marginRight: '5px' }}>➕</span> Add Member
+</button>
 )}
 
 
 
 {groupList.includes(recipient) && (
-  <button
-    className="btn btn-sm btn-danger mb-2"
-    onClick={() => leaveGroup(recipient)}
-  >
-    Leave Group
-  </button>
+  <button className="group-action-btn leave" onClick={() => leaveGroup(recipient)}>
+  Leave Group
+</button>
 )}
 
 
 
 {groupList.includes(recipient) && (
-  <button
-    className="btn btn-sm btn-outline-danger my-2 ms-2"
-    onClick={() => setShowRemoveMemberModal(true)}
-  >
-    ❌ Remove Member
-  </button>
+  <button className="group-action-btn remove" onClick={() => setShowRemoveMemberModal(true)}>
+  <span style={{ marginRight: '5px' }}>❌</span> Remove Member
+</button>
 )}
+
+
 {showRemoveMemberModal && (
   <div className="modal d-block" tabIndex="-1">
     <div className="modal-dialog">
@@ -533,7 +536,7 @@ return (
     className="d-flex justify-content-between align-items-center border-bottom px-2 py-2"
     style={{
       position: 'sticky',
-      top: 0,
+      top: 7,
       backgroundColor: '#fff',
       zIndex: 10,
     }}
@@ -554,13 +557,17 @@ return (
 
 
 <div
-  className={`flex-grow-1 mb-2 ${recipient ? 'border p-3 rounded bg-light' : ''}`}
-  style={{ overflowY: 'auto' }}
->           {recipient ? (
+  className={`flex-grow-1 ${recipient ? 'border p-3 rounded bg-light' : ''}`}
+  style={{
+    overflowY: 'auto',
+    marginTop: '10px',
+    marginBottom: '0px',
+  }}
+>
+         {recipient ? (
   messageList.map((msg, idx) => (
     <div
       key={idx}
-      className={`d-flex flex-column ${msg.from === username ? 'align-items-end' : 'align-items-start'} mb-3 fade-in`}
       onClick={() => setSelectedMsgIndex(idx)}
       style={{ cursor: 'pointer' }}
     >
@@ -579,7 +586,7 @@ return (
       setSelectedImage(msg.image);
       setSelectedImageIndex(idx);
     }}
-    style={{ maxWidth: '100%', marginTop: '10px', borderRadius: '5px' }}
+  className="small-chat-image"
   />
 )}
 
@@ -662,24 +669,35 @@ return (
     </div>
   ))
 ) : (
- <div className="d-flex flex-column justify-content-center align-items-center text-center" style={{ height: '100%' }}>
-      <h4 className="text-muted mb-2">💬 Select a user or group</h4>
-      <p className="text-muted">Start chatting by selecting a name from the left panel.</p>
-    </div>
+<div className="d-flex flex-column justify-content-center align-items-center text-center" style={{ height: '100%' }}>
+
+  <img
+    src="/7648244.png"
+    alt="Chat Illustration"
+    style={{ maxWidth: '150px', marginBottom: '20px' }}
+  />
+
+  <h4 className="text-muted mb-2">💬 Select a user or group</h4>
+  <p className="text-muted">Start chatting by selecting a name from the left panel.</p>
+
+</div>
+
 )}
 
             <div ref={chatEndRef} />
           </div>
 
           {/* Sticky Message Input */}
+          {recipient && (
           <div
     className="input-group"
     style={{
       position: 'sticky',
       bottom: '0',
       backgroundColor: '#fff',
-      paddingBottom: '10px',
-      paddingTop: '5px',
+      paddingBottom: '0px',
+      paddingTop: '0px',
+      marginBottom: '5px',
       zIndex: 10,
     }}
           >
@@ -701,9 +719,10 @@ return (
       Send
     </button>
           </div>
+          )}
         </div>
       </div>
-
+  
       {/* Fullscreen Image View */}
       {selectedImage && (
         <div

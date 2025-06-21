@@ -56,3 +56,106 @@ p {
 .text-danger {
   font-weight: 500;
 }
+/* Base styles for all group action buttons */
+.group-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.25s ease-in-out;
+  cursor: pointer;
+}
+
+/* Add Member - Muted Blue */
+.group-action-btn.add {
+  background-color: #357edd;        /* Muted primary blue */
+  color: #ffffff;
+  border-color: #2f6ec2;
+}
+
+.group-action-btn.add:hover {
+  background-color: #2f6ec2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.group-action-btn.add:active {
+  background-color: #265bad;
+}
+
+/* Leave Group - Muted Red */
+.group-action-btn.leave {
+  background-color: #d9534f;        /* Bootstrap danger-like but slightly muted */
+  color: #fff;
+  border-color: #c9302c;
+}
+
+.group-action-btn.leave:hover {
+  background-color: #c9302c;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.group-action-btn.leave:active {
+  background-color: #a12521;
+}
+
+/* Remove Member - Outline Red */
+.group-action-btn.remove {
+  background-color: transparent;
+  color: #d9534f;
+  border: 2px solid #d9534f;
+}
+
+.group-action-btn.remove:hover {
+  background-color: #d9534f;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.group-action-btn.remove:active {
+  background-color: #a12521;
+  border-color: #a12521;
+}
+
+/* Focus Ring (for accessibility) */
+.group-action-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+.message-bubble {
+  margin: 8px 0;
+  padding: 10px 15px;
+  border-radius: 12px;
+  max-width: 75%;
+  word-wrap: break-word;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.message-from-me {
+  background-color: #d4f8c4;
+  align-self: flex-end;
+}
+
+.message-from-other {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+}
+
+.col-md-3 {
+  border-right: none !important;
+}
+.col-md-9 {
+  border-left: none !important;
+}
+.small-chat-image {
+  max-width: 400px;
+  max-height: 300px;
+  margin-top: 10px;
+  border-radius: 5px;
+  object-fit: cover;
+  cursor: pointer;
+}
