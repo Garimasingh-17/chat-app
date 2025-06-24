@@ -308,6 +308,25 @@ useEffect(() => {
   };
 }, [recipient]);
 
+useEffect(() => {
+  const handlePrivateDelete = ({ time }) => {
+    setMessageList((prev) => prev.filter((msg) => msg.time !== time));
+  };
+
+  const handleGroupDelete = ({ time, groupName }) => {
+    if (recipient === groupName) {
+      setMessageList((prev) => prev.filter((msg) => msg.time !== time));
+    }
+  };
+
+  socket.on('private_message_deleted', handlePrivateDelete);
+  socket.on('group_message_deleted', handleGroupDelete);
+
+  return () => {
+    socket.off('private_message_deleted', handlePrivateDelete);
+    socket.off('group_message_deleted', handleGroupDelete);
+  };
+}, [recipient]);
 
 
  const handleFileChange = (e) => {
@@ -334,11 +353,27 @@ useEffect(() => {
 
 
   const handleDeleteMessage = (index) => {
-    const updatedMessages = [...messageList];
-    updatedMessages.splice(index, 1);
-    setMessageList(updatedMessages);
-    setSelectedMsgIndex(null);
-  };
+  const msg = messageList[index];
+  if (!msg) return;
+
+  const isGroup = groupList.includes(recipient);
+
+  if (isGroup) {
+    socket.emit('delete_group_message', {
+      groupName: msg.to,
+      timestamp: msg.time, // Ideally use msg.id if implemented
+    });
+  } else {
+    socket.emit('delete_private_message', {
+      from: username,
+      to: recipient,
+      timestamp: msg.time,
+    });
+  }
+
+  setSelectedMsgIndex(null);
+};
+
 
   const handleForward = (msg) => {
     setForwardMessageContent(msg);

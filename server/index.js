@@ -91,6 +91,39 @@ userGroups.forEach(group => {
   unreadCounts[group] = unread.length;
 });
 
+
+socket.on('delete_private_message', ({ from, to, timestamp }) => {
+  const key = getKey(from, to);
+  if (!privateMessages[key]) return;
+
+  privateMessages[key] = privateMessages[key].filter(msg => msg.time !== timestamp);
+
+  // Save changes
+  fs.writeFileSync(PRIVATE_MESSAGES_FILE, JSON.stringify(privateMessages, null, 2));
+
+  // Notify both users
+  const toSocket = users[to];
+  const fromSocket = users[from];
+  const payload = { time: timestamp, from, to };
+
+  if (toSocket) io.to(toSocket).emit('private_message_deleted', payload);
+  if (fromSocket) io.to(fromSocket).emit('private_message_deleted', payload);
+});
+
+
+socket.on('delete_group_message', ({ groupName, timestamp }) => {
+  if (!groupMessages[groupName]) return;
+
+  groupMessages[groupName] = groupMessages[groupName].filter(msg => msg.time !== timestamp);
+
+  // Save changes
+  fs.writeFileSync(GROUP_MESSAGES_FILE, JSON.stringify(groupMessages, null, 2));
+
+  // Notify group members
+  io.to(groupName).emit('group_message_deleted', { time: timestamp, groupName });
+});
+
+
 socket.emit('group_unread_counts', unreadCounts);
 
     // After emitting group_list to socket
@@ -157,6 +190,11 @@ userGroups.forEach(group => {
 
   });
 
+
+
+
+  
+  
   // Fetch private history
   socket.on('fetch_history', ({ from, to }) => {
     const key = getKey(from, to);
